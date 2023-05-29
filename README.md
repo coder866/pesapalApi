@@ -181,9 +181,7 @@ curl --location 'https://cybqa.pesapal.com/pesapalv3/apiURLSetup/GetIpnList' \
   {
     "url": "https://www.myapplication.com/ipn",
     "created_date": "2022-03-03T17:29:03.7208266Z",
-    "ipn_id": "e32182ca-0983-4fa0-91bc-c3bb
-
-813ba750",
+    "ipn_id": "e32182ca-0983-4fa0-91bc-c3bb813ba750",
     "error": null,
     "status": "200"
   },
