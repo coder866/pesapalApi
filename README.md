@@ -57,8 +57,8 @@ curl --location 'https://cybqa.pesapal.com/pesapalv3/api/URLSetup/RegisterIPN' \
 
 ## TODO
 
-a) Generate IPN Registration Implementation. On successful registration, receive the response payload and extract "ipn_id" to store it in the database.
-b) Create a method for retrieving the stored "ipn_id". Remember, the "ipn_id" will be used when submitting orders.
+a) Generate IPN Registration Implementation. On successful registration, receive the response payload and extract "ipn_id" to store it in the database.\n
+b) Create a method for retrieving the stored "ipn_id". Remember, the "ipn_id" will be used when submitting orders.\n
 
 ## Order Submission Request Sample
 
