@@ -9,9 +9,11 @@ use App\Models\PaymentNotification;
 use App\Models\TransactionStatus;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class PesapalController extends Controller
 {
@@ -126,16 +128,16 @@ class PesapalController extends Controller
             'billing_address' => [
                 'email_address' => $orderDetails['billing_address']['email_address'],
                 'phone_number' => $orderDetails['billing_address']['phone_number'],
-                'country_code' => $orderDetails['billing_address']['country_code'],
+                'country_code' => Arr::has($orderDetails, ['billing_address', 'country_code']) ? $orderDetails['billing_address']['country_code'] : '',
                 'first_name' => $orderDetails['billing_address']['first_name'],
-                'middle_name' => $orderDetails['billing_address']['middle_name'],
+                'middle_name' => Arr::has($orderDetails, ['billing_address', 'middle_name']) ? $orderDetails['billing_address']['middle_name'] : '',
                 'last_name' => $orderDetails['billing_address']['last_name'],
-                'line_1' => $orderDetails['billing_address']['line_1'],
-                'line_2' => $orderDetails['billing_address']['line_2'],
-                'city' => $orderDetails['billing_address']['city'],
-                'state' => $orderDetails['billing_address']['state'],
-                'postal_code' => $orderDetails['billing_address']['postal_code'],
-                'zip_code' => $orderDetails['billing_address']['zip_code'],
+                'line_1' => Arr::has($orderDetails, ['billing_address', 'line_1']) ? $orderDetails['billing_address']['line_1'] : '',
+                'line_2' => Arr::has($orderDetails, ['billing_address', 'line_2']) ? $orderDetails['billing_address']['line_2'] : '',
+                'city' => Arr::has($orderDetails, ['billing_address', 'city']) ? $orderDetails['billing_address']['city'] : '',
+                'state' => Arr::has($orderDetails, ['billing_address', 'state']) ? $orderDetails['billing_address']['state'] : '',
+                'postal_code' => Arr::has($orderDetails, ['billing_address', 'postal_code']) ? $orderDetails['billing_address']['postal_code'] : '',
+                'zip_code' => Arr::has($orderDetails, ['billing_address', 'zip_code']) ? $orderDetails['billing_address']['zip_code'] : '',
             ],
         ];
 
@@ -184,9 +186,10 @@ class PesapalController extends Controller
                 $errorMessage = $response->json('error.message');
                 return response()->json(['error' => $errorMessage], $response->status());
             }
-        } catch (Exception $e) {
+        } catch (Throwable $th) {
+            Storage::disk('local')->prepend('orderSub.json', $th->getMessage());
             // Handle any exceptions that occur during the API request
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $th->getMessage()], 500);
         }
     }
 
@@ -201,9 +204,9 @@ class PesapalController extends Controller
             $order->description = $orderDetails['description'];
             $order->currency = $orderDetails['currency'];
             $order->amount = $orderDetails['amount'];
-            $order->first_name = $orderDetails['first_name'];
-            $order->last_name = $orderDetails['last_name'];
-            $order->cellphone = $orderDetails['cellphone'];
+            $order->first_name = $orderDetails['billing_address']['first_name'];
+            $order->last_name = $orderDetails['billing_address']['last_name'];
+            $order->cellphone = $orderDetails['billing_address']['phone_number'];
             $order->save();
         } catch (\Throwable $th) {
             Storage::disk('local')->prepend('orderLog.json', $th->getMessage());
