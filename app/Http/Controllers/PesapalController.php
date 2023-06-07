@@ -90,60 +90,61 @@ class PesapalController extends Controller
      */
     public function submitOrder(Request $request)
     {
-        // Validate the request data
-        $request->validate([
-            'order_id' => 'required|string',
-            'currency' => 'required|string',
-            'amount' => 'required|numeric',
-            'description' => 'required|string',
-            'billing_address.email_address' => 'required|email',
-            'billing_address.phone_number' => 'nullable|required_without:billing_address.email_address|string',
-            'billing_address.first_name' => 'required|string',
-            'billing_address.last_name' => 'required|string',
-
-        ]);
-
-
-        // Extract the order details from the request
-        $orderDetails = $request->json()->all();
-
-
-
-        // Get the authentication token
-        // $token = $this->generateAuthToken();
-
-        // Prepare the API endpoint URL
-        $endpoint = 'https://cybqa.pesapal.com/pesapalv3/api/Transactions/SubmitOrderRequest';
-
-
-        // Prepare the request payload
-        $payload = [
-            'id' => $orderDetails['order_id'],
-            'currency' => $orderDetails['currency'],
-            'amount' => $orderDetails['amount'],
-            'description' => $orderDetails['description'],
-            'callback_url' => $orderDetails['callback_url'],
-            'notification_id' => $this->getIPNID(), //$orderDetails['notification_id'],
-            'billing_address' => [
-                'email_address' => $orderDetails['billing_address']['email_address'],
-                'phone_number' => $orderDetails['billing_address']['phone_number'],
-                'country_code' => isset($orderDetails['billing_address']['country_code']) ? $orderDetails['billing_address']['country_code'] : '',
-                'first_name' => $orderDetails['billing_address']['first_name'],
-                'middle_name' => isset($orderDetails, ['billing_address']['middle_name']) ? $orderDetails['billing_address']['middle_name'] : '',
-                'last_name' => $orderDetails['billing_address']['last_name'],
-                'line_1' =>  isset($orderDetails, ['billing_address']['line_1']) ? $orderDetails['billing_address']['line_1'] : '',
-                'line_2' =>  isset($orderDetails, ['billing_address']['line_2']) ? $orderDetails['billing_address']['line_2'] : '',
-                'city' =>  isset($orderDetails['billing_address']['city']) ? $orderDetails['billing_address']['city'] : '',
-                'state' =>  isset($orderDetails, ['billing_address']['state']) ? $orderDetails['billing_address']['state'] : '',
-                'postal_code' =>  isset($orderDetails, ['billing_address']['postal_code']) ? $orderDetails['billing_address']['postal_code'] : '',
-                'zip_code' =>  isset($orderDetails, ['billing_address']['zip_code']) ? $orderDetails['billing_address']['zip_code'] : '',
-            ],
-        ];
-
-        // dd($payload);
-        return $payload;
-
         try {
+            // Validate the request data
+            $request->validate([
+                'order_id' => 'required|string',
+                'currency' => 'required|string',
+                'amount' => 'required|numeric',
+                'description' => 'required|string',
+                'billing_address.email_address' => 'required|email',
+                'billing_address.phone_number' => 'nullable|required_without:billing_address.email_address|string',
+                'billing_address.first_name' => 'required|string',
+                'billing_address.last_name' => 'required|string',
+
+            ]);
+
+
+            // Extract the order details from the request
+            $orderDetails = $request->json()->all();
+
+
+
+            // Get the authentication token
+            // $token = $this->generateAuthToken();
+
+            // Prepare the API endpoint URL
+            $endpoint = 'https://cybqa.pesapal.com/pesapalv3/api/Transactions/SubmitOrderRequest';
+
+
+            // Prepare the request payload
+            $payload = [
+                'id' => $orderDetails['order_id'],
+                'currency' => $orderDetails['currency'],
+                'amount' => $orderDetails['amount'],
+                'description' => $orderDetails['description'],
+                'callback_url' => $orderDetails['callback_url'],
+                'notification_id' => $this->getIPNID(), //$orderDetails['notification_id'],
+                'billing_address' => [
+                    'email_address' => $orderDetails['billing_address']['email_address'],
+                    'phone_number' => $orderDetails['billing_address']['phone_number'],
+                    'country_code' => isset($orderDetails['billing_address']['country_code']) ? $orderDetails['billing_address']['country_code'] : '',
+                    'first_name' => $orderDetails['billing_address']['first_name'],
+                    'middle_name' => isset($orderDetails, ['billing_address']['middle_name']) ? $orderDetails['billing_address']['middle_name'] : '',
+                    'last_name' => $orderDetails['billing_address']['last_name'],
+                    'line_1' =>  isset($orderDetails, ['billing_address']['line_1']) ? $orderDetails['billing_address']['line_1'] : '',
+                    'line_2' =>  isset($orderDetails, ['billing_address']['line_2']) ? $orderDetails['billing_address']['line_2'] : '',
+                    'city' =>  isset($orderDetails['billing_address']['city']) ? $orderDetails['billing_address']['city'] : '',
+                    'state' =>  isset($orderDetails, ['billing_address']['state']) ? $orderDetails['billing_address']['state'] : '',
+                    'postal_code' =>  isset($orderDetails, ['billing_address']['postal_code']) ? $orderDetails['billing_address']['postal_code'] : '',
+                    'zip_code' =>  isset($orderDetails, ['billing_address']['zip_code']) ? $orderDetails['billing_address']['zip_code'] : '',
+                ],
+            ];
+
+            // dd($payload);
+            return $payload;
+
+
 
             //Log Submitted order
 
