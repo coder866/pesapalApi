@@ -243,13 +243,9 @@ class PesapalController extends Controller
             $responseData = $response->json();
 
             //Log Status Response
-            $data = $responseData;
-            $transactionStatus = new TransactionStatus();
-            $transactionStatus->fill($data);
-            $transactionStatus->save();
+            $this->logTransactionStatus($responseData);
 
             //Find order via merchant reference & Update the paymentstatus
-
             $order = Order::where('merchant_reference', $responseData['merchant_reference'])->first();
             $order->update(
                 [
@@ -265,6 +261,33 @@ class PesapalController extends Controller
         } catch (\Throwable $e) {
             // Handle the error
             return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function logTransactionStatus($responseData)
+    {
+        try {
+            //Log Status Response
+            $data = $responseData;
+            $transactionStatus = new TransactionStatus();
+            $transactionStatus->payment_method = $data['payment_method'];
+            $transactionStatus->amount = $data['amount'];
+            $transactionStatus->created_date = $data['created_date'];
+            $transactionStatus->confirmation_code = $data['confirmation_code'];
+            $transactionStatus->payment_status_description = $data['payment_status_description'];
+            $transactionStatus->description = $data['description'];
+            $transactionStatus->message = $data['message'];
+            $transactionStatus->payment_account = $data['payment_account'];
+            $transactionStatus->call_back_url = $data['call_back_url'];
+            $transactionStatus->status_code = $data['status_code'];
+            $transactionStatus->merchant_reference = $data['merchant_reference'];
+            $transactionStatus->payment_status_code = $data['payment_status_code'];
+            $transactionStatus->currency = $data['currency'];
+            $transactionStatus->error = json_encode($data['error']);
+            $transactionStatus->status = $data['status'];
+            $transactionStatus->save();
+        } catch (\Throwable $th) {
+            Storage::disk()->prepend('logTranstat.json', $th->getMessage());
         }
     }
 
