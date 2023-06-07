@@ -139,12 +139,13 @@ class PesapalController extends Controller
             ],
         ];
 
-        //Log Submitted order
-
-        $this->logSubmittedOrder($payload);
-
-        // Make the API request
         try {
+
+            //Log Submitted order
+
+            $this->logSubmittedOrder($payload);
+
+            // Make the API request
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Bearer ' . $token,
