@@ -193,7 +193,7 @@ class PesapalController extends Controller
 
     public function logSubmittedOrder($orderDetails)
     {
-        Storage::disk('local')->prepend('order.json', $orderDetails);
+        Storage::disk('local')->prepend('order.json', json_encode($orderDetails));
         try {
             $order = new Order();
             $order->order_id = $orderDetails['order_id'];
