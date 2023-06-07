@@ -110,10 +110,11 @@ class PesapalController extends Controller
 
 
         // Get the authentication token
-        $token = $this->generateAuthToken();
+        // $token = $this->generateAuthToken();
 
         // Prepare the API endpoint URL
         $endpoint = 'https://cybqa.pesapal.com/pesapalv3/api/Transactions/SubmitOrderRequest';
+
 
         // Prepare the request payload
         $payload = [
