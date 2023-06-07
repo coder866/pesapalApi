@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ipn;
 use App\Models\Order;
 use App\Models\OrderSubmissionResponse;
 use App\Models\PaymentNotification;
@@ -70,6 +71,8 @@ class PesapalController extends Controller
             $ipnId = $responseData['ipn_id'];
 
             // Save the ipnId in the database for future use
+            //Save the IPN_ID received ~ It will be used to when submitting  the order    
+            Ipn::create(['ipn_id' => $ipnId]);
 
             return response()->json(['ipn_id' => $ipnId], 200);
         } catch (\Throwable $e) {
@@ -119,7 +122,7 @@ class PesapalController extends Controller
             'amount' => $orderDetails['amount'],
             'description' => $orderDetails['description'],
             'callback_url' => $orderDetails['callback_url'],
-            'notification_id' => $orderDetails['notification_id'],
+            'notification_id' => $this->getIPNID(), //$orderDetails['notification_id'],
             'billing_address' => [
                 'email_address' => $orderDetails['billing_address']['email_address'],
                 'phone_number' => $orderDetails['billing_address']['phone_number'],
@@ -308,6 +311,7 @@ class PesapalController extends Controller
 
             $responseData = $response->json();
 
+
             return response()->json($responseData, 200);
         } catch (\Throwable $e) {
             // Handle the error
@@ -329,5 +333,10 @@ class PesapalController extends Controller
             default:
                 return 'UNKOWN';
         }
+    }
+    public function getIPNID()
+    {
+        $ipn = Ipn::first();
+        return $ipn->ipn_id;
     }
 }
