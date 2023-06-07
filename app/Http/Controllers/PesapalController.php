@@ -207,7 +207,7 @@ class PesapalController extends Controller
         Storage::disk('local')->prepend('order.json', json_encode($orderDetails));
         try {
             $order = new Order();
-            $order->order_id = $orderDetails['order_id'];
+            $order->order_id = $orderDetails['id'];
             $order->trandate = Carbon::now()->format('Y-m-d H:m:s');
             $order->description = $orderDetails['description'];
             $order->currency = $orderDetails['currency'];
