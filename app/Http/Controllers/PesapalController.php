@@ -139,6 +139,9 @@ class PesapalController extends Controller
             ],
         ];
 
+
+        return $payload;
+
         try {
 
             //Log Submitted order
