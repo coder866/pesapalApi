@@ -176,7 +176,7 @@ class PesapalController extends Controller
                 $order->update([
                     'order_tracking_id' => $orderSubmission->order_tracking_id,
                     'merchant_reference' => $orderSubmission->merchant_reference,
-                    'redirect_url' => $orderSubmission->redirect_url,
+                    // 'redirect_url' => $orderSubmission->redirect_url,
                     'error' => $orderSubmission->error,
                 ]);
 
