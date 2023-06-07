@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\OrderSubmissionResponse;
+use App\Models\PaymentNotification;
+use App\Models\TransactionStatus;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class PesapalController extends Controller
 {
@@ -93,9 +98,13 @@ class PesapalController extends Controller
 
         ]);
 
+
         // Extract the order details from the request
         $orderDetails = $request->json()->all();
 
+        //Log Submitted order
+
+        $this->logSubmittedOrder($orderDetails);
 
         // Get the authentication token
         $token = $this->generateAuthToken();
@@ -105,12 +114,12 @@ class PesapalController extends Controller
 
         // Prepare the request payload
         $payload = [
-            'id' => $orderDetails['id'],
+            'id' => $orderDetails['order_id'],
             'currency' => $orderDetails['currency'],
             'amount' => $orderDetails['amount'],
             'description' => $orderDetails['description'],
             'callback_url' => $orderDetails['callback_url'],
-            'notification_id' => 'b47aaa49-1fd5-48c6-9b77-e02116131ab4', //$orderDetails['notification_id'],
+            'notification_id' => $orderDetails['notification_id'],
             'billing_address' => [
                 'email_address' => $orderDetails['billing_address']['email_address'],
                 'phone_number' => $orderDetails['billing_address']['phone_number'],
@@ -149,6 +158,16 @@ class PesapalController extends Controller
                     'status' => $responseData['status'],
                 ]);
 
+                //Update Order after submission
+                $order = Order::where('order_id', $orderDetails['order_id'])->first();
+                $order->update([
+                    'order_tracking_id' => $orderSubmission->order_tracking_id,
+                    'merchant_reference' => $orderSubmission->merchant_reference,
+                    'redirect_url' => $orderSubmission->redirect_url,
+                    'error' => $orderSubmission->error,
+                ]);
+
+
                 // Return the order submission response
                 return response()->json([
                     'order_tracking_id' => $orderSubmission->order_tracking_id,
@@ -165,6 +184,26 @@ class PesapalController extends Controller
         } catch (Exception $e) {
             // Handle any exceptions that occur during the API request
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
+    public function logSubmittedOrder($orderDetails)
+    {
+        try {
+            $order = new Order();
+            $order->order_id = $orderDetails['order_id'];
+            $order->trandate = Carbon::now()->format('Y-m-d H:m:s');
+            $order->description = $orderDetails['description'];
+            $order->currency = $orderDetails['currency'];
+            $order->amount = $orderDetails['amount'];
+            $order->first_name = $orderDetails['first_name'];
+            $order->last_name = $orderDetails['last_name'];
+            $order->cellphone = $orderDetails['cellphone'];
+            $order->save();
+        } catch (\Throwable $th) {
+            Storage::disk('local')->prepend('orderLog.json', $th->getMessage());
+            // throw $th;
         }
     }
 
@@ -188,10 +227,29 @@ class PesapalController extends Controller
 
             $responseData = $response->json();
 
-            return response()->json($responseData, 200);
+            //Log Status Response
+            $data = $responseData;
+            $transactionStatus = new TransactionStatus();
+            $transactionStatus->fill($data);
+            $transactionStatus->save();
+
+            //Find order via merchant reference & Update the paymentstatus
+
+            $order = Order::where('merchant_reference', $responseData['merchant_reference'])->first();
+            $order->update(
+                [
+                    'status' => $this->getStatus($responseData['status_code']),
+                    'payment_status_description' => $responseData['payment_status_description'],
+                    'payment_status_info' => $responseData['description']
+
+                ]
+            );
+
+
+            return response()->json(['message' => 'IPN Received Successfully'], 200);
         } catch (\Throwable $e) {
             // Handle the error
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -203,20 +261,35 @@ class PesapalController extends Controller
      */
     public function handleIPNCallback(Request $request)
     {
-        $payload = $request->all();
+        try {
+            $payload = $request->all();
+            Storage::disk()->prepend('ipnCallback.json', $payload);
 
-        $orderMerchantReference = $payload['orderMerchantReference'];
+            // [
+            //     "orderNotificationType"=>"IPNCHANGE",
+            //     "orderTrackingId"=>"d0fa69d6-f3cd-433b-858e-df86555b86c8",
+            //     "orderMerchantReference"=>"1515111111",
+            //     "status"=>200
+            // ]
 
-        // Search for the order based on the orderMerchantReference and update it with the orderTrackingId
+            $ipn = PaymentNotification::create(
+                [
+                    "order_notification_type" => $payload['orderNotificationType'],
+                    "order_tracking_id" => $payload['orderTrackingId'],
+                    "order_merchant_reference" => $payload['orderMerchantReference'],
+                    "status" => $payload['status'],
+                ]
+            );
+            if ($ipn->order_notification_type == 'IPNCHANGE' && $ipn->order_merchant_reference != '') {
+                $this->getTransactionStatus($ipn->order_tracking_id);
+            }
 
-        //TODO  updating the order
-        // $order = Order::where('merchant_reference', $orderMerchantReference)->first();
-        // if ($order) {
-        //     $order->order_tracking_id = $payload['orderTrackingId'];
-        //     $order->save();
-        // }
 
-        return response()->json(['message' => 'IPN callback processed successfully'], 200);
+            return response()->json(['message' => 'IPN callback processed successfully'], 200);
+        } catch (\Throwable $th) {
+            Storage::disk('local')->prepend('IPNerror.json', $th->getMessage());
+            return response()->json(['message' => $th->getMessage()], 200);
+        }
     }
 
     /**
@@ -239,6 +312,22 @@ class PesapalController extends Controller
         } catch (\Throwable $e) {
             // Handle the error
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getStatus($statusCode)
+    {
+        switch ($statusCode) {
+            case 0:
+                return 'INVALID';
+            case 1:
+                return 'COMPLETED';
+            case 2:
+                return 'FAILED';
+            case 3:
+                return 'REVERSED';
+            default:
+                return 'UNKOWN';
         }
     }
 }
