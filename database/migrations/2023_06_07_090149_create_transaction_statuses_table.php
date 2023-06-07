@@ -32,6 +32,8 @@ class CreateTransactionStatusesTable extends Migration
             $table->string('status');
             $table->timestamps();
         });
+
+        //Go Easy
     }
 
     /**
