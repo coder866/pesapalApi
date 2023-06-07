@@ -6,7 +6,7 @@ POST http://localhost:8000/api/pesapal/ipn/register HTTP/1.1
 
 
 ###
-POST http://localhost:8000/api/pesapal/transactions/submit-order HTTP/1.1
+POST https://pesapalapi.samitune.com/api/transactions/submit-order HTTP/1.1
 content-type: application/json
 
 {
@@ -14,8 +14,8 @@ content-type: application/json
      "currency": "KES",
      "amount": 100.00,
      "description": "Payment description goes here",
-     "callback_url": "https://www.myapplication.com/response-page",
-     "notification_id": "b47aaa49-1fd5-48c6-9b77-e02116131ab4",
+     "callback_url": "https://pesapalapi.samitune.com/api/ipn/list",
+    // "notification_id": "b47aaa49-1fd5-48c6-9b77-e02116131ab4",
      "billing_address": {
          "email_address": "john.doe@example.com",
          "phone_number": "",

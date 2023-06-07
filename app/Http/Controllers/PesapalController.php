@@ -126,20 +126,20 @@ class PesapalController extends Controller
             'billing_address' => [
                 'email_address' => $orderDetails['billing_address']['email_address'],
                 'phone_number' => $orderDetails['billing_address']['phone_number'],
-                'country_code' => Arr::has($orderDetails, ['billing_address', 'country_code']) ? $orderDetails['billing_address']['country_code'] : '',
+                'country_code' => isset($orderDetails['billing_address']['country_code']) ? $orderDetails['billing_address']['country_code'] : '',
                 'first_name' => $orderDetails['billing_address']['first_name'],
-                'middle_name' => Arr::has($orderDetails, ['billing_address', 'middle_name']) ? $orderDetails['billing_address']['middle_name'] : '',
+                'middle_name' => isset($orderDetails, ['billing_address']['middle_name']) ? $orderDetails['billing_address']['middle_name'] : '',
                 'last_name' => $orderDetails['billing_address']['last_name'],
-                'line_1' => Arr::has($orderDetails, ['billing_address', 'line_1']) ? $orderDetails['billing_address']['line_1'] : '',
-                'line_2' => Arr::has($orderDetails, ['billing_address', 'line_2']) ? $orderDetails['billing_address']['line_2'] : '',
-                'city' => Arr::has($orderDetails, ['billing_address', 'city']) ? $orderDetails['billing_address']['city'] : '',
-                'state' => Arr::has($orderDetails, ['billing_address', 'state']) ? $orderDetails['billing_address']['state'] : '',
-                'postal_code' => Arr::has($orderDetails, ['billing_address', 'postal_code']) ? $orderDetails['billing_address']['postal_code'] : '',
-                'zip_code' => Arr::has($orderDetails, ['billing_address', 'zip_code']) ? $orderDetails['billing_address']['zip_code'] : '',
+                'line_1' =>  isset($orderDetails, ['billing_address']['line_1']) ? $orderDetails['billing_address']['line_1'] : '',
+                'line_2' =>  isset($orderDetails, ['billing_address']['line_2']) ? $orderDetails['billing_address']['line_2'] : '',
+                'city' =>  isset($orderDetails['billing_address']['city']) ? $orderDetails['billing_address']['city'] : '',
+                'state' =>  isset($orderDetails, ['billing_address']['state']) ? $orderDetails['billing_address']['state'] : '',
+                'postal_code' =>  isset($orderDetails, ['billing_address']['postal_code']) ? $orderDetails['billing_address']['postal_code'] : '',
+                'zip_code' =>  isset($orderDetails, ['billing_address']['zip_code']) ? $orderDetails['billing_address']['zip_code'] : '',
             ],
         ];
 
-
+        // dd($payload);
         return $payload;
 
         try {
