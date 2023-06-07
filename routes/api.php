@@ -21,19 +21,19 @@ use Illuminate\Support\Facades\Route;
 // });
 
 // Authentication
-Route::post('/pesapal/auth/request-token', [PesapalController::class, 'generateAuthToken']);
+Route::post('/auth/request-token', [PesapalController::class, 'generateAuthToken']);
 
 // IPN Registration
-Route::post('/pesapal/ipn/register', [PesapalController::class, 'registerIPN']);
+Route::post('/ipn/register', [PesapalController::class, 'registerIPN']);
 
 // Order Submission
-Route::post('/pesapal/transactions/submit-order', [PesapalController::class, 'submitOrder']);
+Route::post('/transactions/submit-order', [PesapalController::class, 'submitOrder']);
 
 // Get Transaction Status
-Route::get('/pesapal/transactions/{orderTrackingId}/status', [PesapalController::class, 'getTransactionStatus']);
+Route::get('/transactions/{orderTrackingId}/status', [PesapalController::class, 'getTransactionStatus']);
 
 // IPN Callback
 Route::post('/ipn', [PesapalController::class, 'handleIPNCallback']);
 
 // List IPN Registrations
-Route::get('/pesapal/ipn/list', [PesapalController::class, 'getIPNList']);
+Route::get('/ipn/list', [PesapalController::class, 'getIPNList']);
