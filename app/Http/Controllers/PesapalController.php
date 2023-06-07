@@ -90,7 +90,7 @@ class PesapalController extends Controller
     {
         // Validate the request data
         $request->validate([
-            'id' => 'required|string',
+            'order_id' => 'required|string',
             'currency' => 'required|string',
             'amount' => 'required|numeric',
             'description' => 'required|string',
@@ -193,6 +193,7 @@ class PesapalController extends Controller
 
     public function logSubmittedOrder($orderDetails)
     {
+        Storage::disk('local')->prepend('order.json', $orderDetails);
         try {
             $order = new Order();
             $order->order_id = $orderDetails['order_id'];
