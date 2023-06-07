@@ -107,9 +107,7 @@ class PesapalController extends Controller
         // Extract the order details from the request
         $orderDetails = $request->json()->all();
 
-        //Log Submitted order
 
-        $this->logSubmittedOrder($orderDetails);
 
         // Get the authentication token
         $token = $this->generateAuthToken();
@@ -140,6 +138,10 @@ class PesapalController extends Controller
                 'zip_code' => Arr::has($orderDetails, ['billing_address', 'zip_code']) ? $orderDetails['billing_address']['zip_code'] : '',
             ],
         ];
+
+        //Log Submitted order
+
+        $this->logSubmittedOrder($payload);
 
         // Make the API request
         try {
