@@ -124,7 +124,7 @@ class PesapalController extends Controller
                 'currency' => $orderDetails['currency'],
                 'amount' => $orderDetails['amount'],
                 'description' => $orderDetails['description'],
-                'callback_url' => $orderDetails['callback_url'],
+                'callback_url' => 'https://pesapalapi.samitune.com', //$orderDetails['callback_url'],
                 'notification_id' => $this->getIPNID(), //$orderDetails['notification_id'],
                 'billing_address' => [
                     'email_address' => $orderDetails['billing_address']['email_address'],
