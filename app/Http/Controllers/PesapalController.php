@@ -302,7 +302,7 @@ class PesapalController extends Controller
     {
         try {
             $payload = $request->all();
-            Storage::disk()->prepend('ipnCallback.json', $payload);
+            Storage::disk()->prepend('ipnCallback.json', json_encode($payload));
 
             // [
             //     "orderNotificationType"=>"IPNCHANGE",
