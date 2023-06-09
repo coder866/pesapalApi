@@ -58,11 +58,12 @@ class PesapalController extends Controller
         $token = $this->generateAuthToken();
 
         $requestPayload = [
-            'url' => env('APP_URL') . '/ipn',
+            'url' => env('APP_URL') . '/api/ipn',
             'ipn_notification_type' => 'POST',
         ];
 
         try {
+            Ipn::truncate();
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
