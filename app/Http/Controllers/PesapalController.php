@@ -276,7 +276,7 @@ class PesapalController extends Controller
             $transactionStatus->created_date = $data['created_date'];
             $transactionStatus->confirmation_code = $data['confirmation_code'];
             $transactionStatus->payment_status_description = $data['payment_status_description'];
-            $transactionStatus->description = $data['description'];
+            $transactionStatus->description = $data['description'] ?? '';
             $transactionStatus->message = $data['message'];
             $transactionStatus->payment_account = $data['payment_account'];
             $transactionStatus->call_back_url = $data['call_back_url'];
