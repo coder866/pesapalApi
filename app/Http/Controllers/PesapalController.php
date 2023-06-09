@@ -313,10 +313,10 @@ class PesapalController extends Controller
 
             $ipn = PaymentNotification::create(
                 [
-                    "order_notification_type" => $payload['orderNotificationType'],
-                    "order_tracking_id" => $payload['orderTrackingId'],
-                    "order_merchant_reference" => $payload['orderMerchantReference'],
-                    "status" => $payload['status'],
+                    "order_notification_type" => $payload['OrderNotificationType'],
+                    "order_tracking_id" => $payload['OrderTrackingId'],
+                    "order_merchant_reference" => $payload['OrderMerchantReference'],
+                    "status" => 0,
                 ]
             );
             if ($ipn->order_notification_type == 'IPNCHANGE' && $ipn->order_merchant_reference != '') {
