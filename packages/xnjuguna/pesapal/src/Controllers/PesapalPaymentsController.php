@@ -1,21 +1,39 @@
 <?php
+namespace Xnjuguna\Pesapal\Controllers;
 
-namespace App\Http\Controllers;
-
-use App\Models\Ipn;
-use App\Models\PesapalOrderSubmissionResponse;
-use App\Models\PesapalPaymentNotification;
-use App\Models\PesapalOrder;
-use App\Models\PesapalTransactionStatus;
+use App\Http\Controllers\Controller;
+use Xnjuguna\Pesapal\Models\PesapalOrderSubmissionResponse;
+use Xnjuguna\Pesapal\Models\PesapalPaymentNotification;
+use Xnjuguna\Pesapal\Models\PesapalTransactionStatus;
+use Xnjuguna\Pesapal\Models\PesapalOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
-use Throwable;
 
-class PesapalController extends Controller
+class PesapalPaymentsController extends Controller 
 {
+    /**
+     * 
+     * List Orders
+     */
+
+    public function getOrdersList(){
+        try {
+            $cacheKey = "pesapal_orders";
+
+            $orders=Cache::remember($cacheKey,now()->addMinutes(10),function(){
+                return PesapalOrder::OrderBy('created_at','desc')->get();
+            });
+            return Response()->json($orders,200);
+            
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
     /**
      * Generate the authentication token.
      *
@@ -25,8 +43,8 @@ class PesapalController extends Controller
     {
 
         $requestPayload = [
-            'consumer_key' => env('PESAPAL_KEY'),
-            'consumer_secret' => env('PESAPAL_SECRET'),
+            'consumer_key' => Config('pesapal.consumer_key'),
+            'consumer_secret' => Config('pesapal.consumer_secret'),
         ];
         try {
             $authEndPoint = 'https://cybqa.pesapal.com/pesapalv3/api/Auth/RequestToken';
@@ -57,12 +75,12 @@ class PesapalController extends Controller
         $token = $this->generateAuthToken();
 
         $requestPayload = [
-            'url' => env('APP_URL') . '/api/ipn',
+            'url' => config('pesapal.callback_url'),
             'ipn_notification_type' => 'POST',
         ];
 
         try {
-            Ipn::truncate();
+            
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
@@ -103,13 +121,14 @@ class PesapalController extends Controller
             chmod($envFilePath, 0777);
 
             // Get the contents of the .env file
+            
             $envContents = File::get($envFilePath);
 
             // Replace the existing IPN_ID value or add it if not present
-            if (strpos($envContents, 'PESAPAL_IPN_ID') !== false) {
-                $envContents = preg_replace('/IPN_ID=.*/', "PESAPAL_IPN_ID=$ipnid", $envContents);
+            if (strpos($envContents, 'IPN_ID') !== false) {
+                $envContents = preg_replace('/IPN_ID=.*/', "IPN_ID=$ipnid", $envContents);
             } else {
-                $envContents .= "\PESAPAL_IPN_ID=$ipnid\n";
+                $envContents .= "\nIPN_ID=$ipnid\n";
             }
 
             // Write the updated contents back to the .env file
@@ -118,11 +137,21 @@ class PesapalController extends Controller
             // Change the .env file mode back to the initial mode (400, readable only for owner)
             chmod($envFilePath, $initialMode);
 
-            return response()->json(['message' => 'PESAPAL_IPN_ID updated successfully']);
+            return response()->json(['message' => 'IPN_ID updated successfully']);
         } catch (\Throwable $th) {
             throw $th;
         }
     }
+
+    /** 
+     * Fetch IPN_ID
+     * 
+     */
+
+     public function getIPNID()
+     {
+         return config('pesapal.ipn_id');
+     }
 
     /**
      * Submit an order.
@@ -237,7 +266,7 @@ class PesapalController extends Controller
                 $errorMessage = $response->json('error.message');
                 return response()->json(['error' => $errorMessage], $response->status());
             }
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             Storage::disk('local')->prepend('orderSub.json', $th->getMessage());
             // Handle any exceptions that occur during the API request
             return response()->json(['error' => $th->getMessage()], 500);
@@ -250,7 +279,7 @@ class PesapalController extends Controller
         Storage::disk('local')->prepend('order.json', json_encode($orderDetails));
         try {
             $order = new PesapalOrder();
-            $order->order_id = $orderDetails['id'];
+            $order->order_id = $orderDetails['id'];        
             $order->trandate = Carbon::now()->format('Y-m-d H:m:s');
             $order->description = $orderDetails['description'];
             $order->currency = $orderDetails['currency'];
@@ -307,11 +336,11 @@ class PesapalController extends Controller
         }
     }
 
-    public function logPesapalTransactionStatus($responseData)
+    public function logPesapalTransactionStatus($data)
     {
         try {
             //Log Status Response
-            $data = $responseData;
+        
             $PesapalTransactionStatus = new PesapalTransactionStatus();
             $PesapalTransactionStatus->payment_method = $data['payment_method'];
             $PesapalTransactionStatus->amount = $data['amount'];
@@ -331,6 +360,7 @@ class PesapalController extends Controller
             $PesapalTransactionStatus->save();
         } catch (\Throwable $th) {
             Storage::disk()->prepend('logTranstat.json', $th->getMessage());
+            throw $th;
         }
     }
 
@@ -343,6 +373,7 @@ class PesapalController extends Controller
     public function handleIPNCallback(Request $request)
     {
         try {
+            
             $payload = $request->all();
             Storage::disk()->prepend('ipnCallback.json', json_encode($payload));
 
@@ -412,9 +443,9 @@ class PesapalController extends Controller
                 return 'UNKOWN';
         }
     }
-    public function getIPNID()
-    {
-        $ipn = Ipn::first();
-        return $ipn->ipn_id;
-    }
+
+
+
+
+
 }

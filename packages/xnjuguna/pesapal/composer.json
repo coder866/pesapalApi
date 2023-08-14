@@ -1,0 +1,31 @@
+{
+    "name": "xnjuguna/pesapal",
+    "description": "Pesapal API 3.0 Payment Gateway Integration Package",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Xnjuguna\\Pesapal\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Njuguna Mmwaura",
+            "email": "coder866@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "guzzlehttp/guzzle": "^7.7.1"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Xnjuguna\\Pesapal\\ServiceProvider"
+            ],
+            "aliases": {
+               
+            }
+        }
+    },
+
+}

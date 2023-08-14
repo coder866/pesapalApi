@@ -57,7 +57,7 @@ curl --location 'https://cybqa.pesapal.com/pesapalv3/api/URLSetup/RegisterIPN' \
 
 ## TODO
 
-a) Generate IPN Registration Implementation. On successful registration, receive the response payload and extract "ipn_id" to store it in the database.  
+a) Generate IPN Registration Implementation. On successful registration, receive the response payload and extract "ipn_id" to store it in the database or anywhere convient and safe for purpose of reusing the same.  
 b) Create a method for retrieving the stored "ipn_id". Remember, the "ipn_id" will be used when submitting orders.  
 
 ## Order Submission Request Sample
@@ -109,7 +109,7 @@ Generate a migration to store Order Submission Response:
 Implement Get Transaction Status Request as follows:
 
 ```bash
-curl --location 'https://cybqa.pesapal.com/pesapalv3/api/Transactions/GetTransactionStatus?orderTrackingId=xxxxxxxxxxxxxx' \
+curl --location 'https://cybqa.pesapal.com/pesapalv3/api/Transactions/GetPesapalTransactionStatus?orderTrackingId=xxxxxxxxxxxxxx' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
 --header 'Authorization: Bearer <token>'

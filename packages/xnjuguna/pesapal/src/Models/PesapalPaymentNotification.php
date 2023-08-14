@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace Xnjuguna\Pesapal\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TransactionStatus extends Model
+class PesapalPaymentNotification extends Model
 {
     use HasFactory;
-
     protected $guarded = [];
 }

@@ -30,7 +30,7 @@ Route::post('/ipn/register', [PesapalController::class, 'registerIPN']);
 Route::post('/transactions/submit-order', [PesapalController::class, 'submitOrder']);
 
 // Get Transaction Status
-Route::get('/transactions/{orderTrackingId}/status', [PesapalController::class, 'getTransactionStatus']);
+Route::get('/transactions/{orderTrackingId}/status', [PesapalController::class, 'getPesapalTransactionStatus']);
 
 // IPN Callback
 Route::post('/ipn', [PesapalController::class, 'handleIPNCallback']);

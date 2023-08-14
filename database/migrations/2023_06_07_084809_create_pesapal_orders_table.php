@@ -5,14 +5,14 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+ class  CreatePesapalOrdersTable extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('pesapal_orders', function (Blueprint $table) {
             $table->id();
             $table->string('order_id');
             $table->datetime('trandate')->default(Carbon::now());
@@ -37,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('pesapal_orders');
     }
 };

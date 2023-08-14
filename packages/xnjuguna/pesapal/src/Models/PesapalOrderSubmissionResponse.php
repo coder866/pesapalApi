@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace Xnjuguna\Pesapal\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class OrderSubmissionResponse extends Model
+class PesapalOrderSubmissionResponse extends Model
 {
     use HasFactory;
     protected $guarded = [];

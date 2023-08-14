@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +15,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
 Route::get('/', function () {
+    
+    // $response = Http::get('https://type.fit/api/quotes/');
+    // $responseData = $response->json();
+    
+    //      $quotes=Arr::random($responseData);
+        
+    //     return $quotes['text'] . ' ~' . $quotes['author'];
     return view('welcome');
 });
+
+Route::get('inspire', function(\Xnjuguna\pesapal\PaymentsApi $payt) {
+    return $payt->inspire();
+});
+
+
