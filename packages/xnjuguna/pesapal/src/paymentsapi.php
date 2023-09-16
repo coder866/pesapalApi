@@ -1,6 +1,6 @@
 <?php
 
-namespace Xnjuguna\pesapal;
+namespace Xnjuguna\Pesapal;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Arr;

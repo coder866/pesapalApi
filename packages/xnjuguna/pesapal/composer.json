@@ -20,12 +20,9 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Xnjuguna\\Pesapal\\ServiceProvider"
-            ],
-            "aliases": {
-               
-            }
+                "Xnjuguna\\Pesapal\\Providers\\PesapalPaymentsProvider"
+            ]
         }
-    },
+    }
 
 }

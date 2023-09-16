@@ -6,15 +6,15 @@ POST http://localhost:8000/api/pesapal/ipn/register HTTP/1.1
 
 
 ###
-POST https://pesapalapi.samitune.com/api/transactions/submit-order HTTP/1.1
+POST https://tunes.digitalhive.co.ke/api/pesapal/transactions/submit-order HTTP/1.1
 content-type: application/json
 
 {
      "order_id": "109156be-c4fb-41ea-b1b4-efe1671c5836",
      "currency": "KES",
-     "amount": 1.00,
+     "amount": 75000.00,
      "description": "Payment description goes here",
-     "callback_url": "https://pesapalapi.samitune.com/api/ipn/list",
+     "callback_url": "https://tunes.digitalhive.co.ke/api/pesapal/transactions/payment-completed",
     // "notification_id": "b47aaa49-1fd5-48c6-9b77-e02116131ab4",
      "billing_address": {
          "email_address": "john.doe@example.com",

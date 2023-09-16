@@ -9,10 +9,14 @@ use Illuminate\Support\Facades\Route;
 Route::post('/auth/request-token', [PesapalPaymentsController::class, 'generateAuthToken']);
 
 // IPN Registration
-Route::post('/ipn/register', [PesapalPaymentsController::class, 'registerIPN']);
+// Route::get('/register/callback', [PesapalPaymentsController::class, 'registerIPN']);
+Route::get('/ipn/register', [PesapalPaymentsController::class, 'registerIPN']);
 
 // Order Submission
 Route::post('/transactions/submit-order', [PesapalPaymentsController::class, 'submitOrder']);
+
+// Receive payment completed response
+Route::get('/transactions/payment-completed', [PesapalPaymentsController::class, 'paymentCompleted']);
 
 // Get Transaction Status
 Route::get('/transactions/{orderTrackingId}/status', [PesapalPaymentsController::class, 'getPesapalTransactionStatus']);
