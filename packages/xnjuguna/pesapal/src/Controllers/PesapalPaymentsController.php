@@ -244,7 +244,7 @@ class PesapalPaymentsController extends Controller
 
             //Log Submitted order
 
-            $this->logSubmittedOrder($payload);
+            $this->logSubmittedOrder($payload,$request->ordertype);
 
             // Make the API request
 
@@ -359,8 +359,11 @@ class PesapalPaymentsController extends Controller
 
                $tranStatus= $this->getPesapalTransactionStatus($payload['OrderTrackingId']);
             //    $this->createSubscription($tranStatus['order']);
-               
             }
+               
+            $statusResp=json_decode($tranStatus->getContent(),true);
+            $message=$statusResp['message'];
+            $order=isset($statusResp['order'])?$statusResp['order']:PesapalOrder::where(['order_tracking_id' => $payload['OrderTrackingId']])->first();
 
             $response =
                 [
@@ -372,6 +375,7 @@ class PesapalPaymentsController extends Controller
                 ];
 
             return response()->json($response);
+
             
         } catch (\Throwable $th) {
             Storage::disk()->prepend('paytCOMPERROR.json', json_encode($th->getMessage()));
@@ -390,7 +394,7 @@ class PesapalPaymentsController extends Controller
     }
 
 
-    public function logSubmittedOrder($orderDetails)
+    public function logSubmittedOrder($orderDetails,$ordertype)
     {
         Storage::disk('local')->prepend('order.json', json_encode($orderDetails));
         try {
@@ -403,6 +407,7 @@ class PesapalPaymentsController extends Controller
             $order->first_name = $orderDetails['billing_address']['first_name'];
             $order->last_name = $orderDetails['billing_address']['last_name'];
             $order->cellphone = $orderDetails['billing_address']['phone_number'];
+            $order->ordertype = $ordertype;
             // $order->account_number = $orderDetails['account_number'];
             // $order->subscription_plan = $orderDetails['subscription_details']['frequency'];
             // $order->subscription_start = Carbon::parse($orderDetails['subscription_details']['start_date'])->format('Y-m-d');
@@ -440,7 +445,7 @@ class PesapalPaymentsController extends Controller
                 //Log Status Response
                 // $this->logPesapalTransactionStatus($responseData);
 
-                //Find order via merchant reference & Update the paymentstatus
+                //Find order via order_tracking_id & Update the paymentstatus
                 $order = PesapalOrder::where(['order_tracking_id' => $orderTrackingId])->first();
                 $order->update(
                     [
@@ -595,7 +600,7 @@ class PesapalPaymentsController extends Controller
      */
     public function api_link($path = null)
     {
-        $live = 'https://pay.pesapal.com/v3/api';
+        $live = 'https://pay.pesapal.com/v3';
         $demo = 'https://cybqa.pesapal.com/pesapalv3/api';
         return (config('pesapal.env') == 'production' ? $live : $demo) . $path;
     }
