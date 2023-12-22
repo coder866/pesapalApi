@@ -52,6 +52,7 @@ class PesapalPaymentsController extends Controller
         ];
         try {
             $authEndPoint = $this->api_link() . '/Auth/RequestToken';
+            dd($authEndPoint);
 
             $response = Http::post($authEndPoint, $requestPayload);
             $responseData = $response->json();
