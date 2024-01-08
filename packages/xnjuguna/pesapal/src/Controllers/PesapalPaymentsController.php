@@ -601,7 +601,7 @@ class PesapalPaymentsController extends Controller
      */
     public function api_link($path = null)
     {
-        $live = 'https://pay.pesapal.com/v3';
+        $live = 'https://pay.pesapal.com/v3/api';
         $demo = 'https://cybqa.pesapal.com/pesapalv3/api';
         return (config('pesapal.env') == 'production' ? $live : $demo) . $path;
     }
